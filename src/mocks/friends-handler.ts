@@ -9,11 +9,11 @@ const fakeFriends: Friend[] = [
 ];
 const handlers = [
   http.get('/api/user/friends', async () => {
-    await delay(5000);
-    return HttpResponse.json(fakeFriends);
+    await delay(3000);
+    return HttpResponse.json([{ food: 'Tacos', rating: 'Delicious' }]);
   }),
   http.post('/api/user/friends', async ({ request }) => {
-    await delay(2000);
+    await delay(5000);
     const body = (await request.json()) as unknown as { name: string };
 
     const newFriend: Friend = {

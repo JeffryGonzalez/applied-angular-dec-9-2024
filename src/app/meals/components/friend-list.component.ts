@@ -11,13 +11,20 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
       <ul class="col-span-1">
         @for (friend of store.friendList(); track friend.id) {
           <li class="flex flex-col gap-4">
-            <a
-              [routerLink]="[friend.id]"
-              class="btn m-4"
-              [routerLinkActive]="['btn-primary']"
-            >
-              {{ friend.name }}
-            </a>
+            @if (friend.isPending) {
+              <button class="btn m-4" disabled>
+                {{ friend.name }}
+                <span class="loading loading-infinity loading-lg"></span>
+              </button>
+            } @else {
+              <a
+                [routerLink]="[friend.id]"
+                class="btn m-4"
+                [routerLinkActive]="['btn-primary']"
+              >
+                {{ friend.name }}
+              </a>
+            }
           </li>
         } @empty {
           <p>Sorry, no friends! So Sad!</p>
