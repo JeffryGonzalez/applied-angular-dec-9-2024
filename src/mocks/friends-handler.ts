@@ -5,9 +5,10 @@ const fakeFriends: Friend[] = [
   { id: '1', name: 'Brad', boughtLastTime: true },
   { id: '2', name: 'Jules', boughtLastTime: false },
   { id: '3', name: 'Louie', boughtLastTime: true },
+  { id: '4', name: 'Michael', boughtLastTime: false },
 ];
 const handlers = [
-  http.get('/user/friends', () => {
+  http.get('/api/user/friends', () => {
     return HttpResponse.json(fakeFriends);
   }),
 ];

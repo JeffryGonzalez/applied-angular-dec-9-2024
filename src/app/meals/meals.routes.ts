@@ -1,15 +1,16 @@
 import { Routes } from '@angular/router';
-import { MealsComponent } from './meals.component';
-import { FriendListComponent } from './components/friend-list.component';
 import { FriendCreateComponent } from './components/friend-create.component';
-import { FriendsStore } from './services/friends.store';
 import { FriendDetailsComponent } from './components/friend-details.component';
+import { FriendListComponent } from './components/friend-list.component';
+import { MealsComponent } from './meals.component';
+import { FriendsStore } from './services/friends.store';
+import { FriendsDataService } from './services/friends-data.service';
 
 export const MEAL_ROUTES: Routes = [
   {
     path: '', // app routes, 'meals' points to this.
     component: MealsComponent,
-    providers: [FriendsStore],
+    providers: [FriendsStore, FriendsDataService],
     children: [
       {
         path: 'list', // meals/list
