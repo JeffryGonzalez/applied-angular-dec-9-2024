@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FriendStatsComponent } from './components/friend-stats.component';
-import { FriendsStore } from './services/friends.store';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { FriendStatsComponent } from './components/friend-stats.component';
 
 @Component({
   selector: 'app-meals',
@@ -12,7 +11,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     <div class="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex flex-col ">
-        <app-friend-stats [numberOfFriends]="store.numberOfFriends()" />
+        <app-friend-stats />
         <router-outlet />
         <label
           for="my-drawer-2"
@@ -48,6 +47,4 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   `,
   styles: ``,
 })
-export class MealsComponent {
-  store = inject(FriendsStore);
-}
+export class MealsComponent {}

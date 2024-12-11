@@ -9,7 +9,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   template: `
     <div class="grid grid-cols-4">
       <ul class="col-span-1">
-        @for (friend of store.entities(); track friend.id) {
+        @for (friend of store.friendList(); track friend.id) {
           <li class="flex flex-col gap-4">
             <a
               [routerLink]="[friend.id]"
