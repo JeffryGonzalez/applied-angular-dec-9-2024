@@ -7,4 +7,8 @@ export class FriendsDataService {
   getFriends() {
     return this.#httpClient.get<Friend[]>('/api/user/friends');
   }
+
+  addFriend(name: string) {
+    return this.#httpClient.post<Friend>('/api/user/friends', { name });
+  }
 }

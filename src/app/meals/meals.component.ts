@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FriendStatsComponent } from './components/friend-stats.component';
 import { FriendsDataService } from './services/friends-data.service';
+import { FriendsStore } from './services/friends.store';
 
 @Component({
   selector: 'app-meals',
@@ -49,10 +50,4 @@ import { FriendsDataService } from './services/friends-data.service';
   `,
   styles: ``,
 })
-export class MealsComponent {
-  service = inject(FriendsDataService);
-
-  constructor() {
-    this.service.getFriends().subscribe((c) => console.log(c));
-  }
-}
+export class MealsComponent {}
