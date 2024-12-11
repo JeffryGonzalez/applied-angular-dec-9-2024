@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { FriendsStore } from '../services/friends.store';
+import { Friend } from '../types';
 
 @Component({
   selector: 'app-friend-details',
@@ -50,6 +51,10 @@ export class FriendDetailsComponent {
   store = inject(FriendsStore);
 
   friend = this.store.selectedFriendInfo;
+
+  toggleTheFriend(friend: Friend) {
+    friend.boughtLastTime = !friend.boughtLastTime;
+  }
   constructor() {
     effect(() => {
       // only used in a constructor (or other "injection context")
