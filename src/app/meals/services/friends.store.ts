@@ -113,12 +113,13 @@ export const FriendsStore = signalStore(
       addFriend: rxMethod<string>(
         pipe(
           map((name) => {
+            // a:string => b: CreateType
             return {
               name,
               tempId: crypto.randomUUID(),
             } as CreateType;
           }),
-          tap((d) => store._addTempFriend(d.name, d.tempId)),
+          tap((d) => store._addTempFriend(d.name, d.tempId)), // d:CreateType => d:CreateType
           mergeMap(
             (
               d, // mergeMap should be used with unsafe HTTP operations (POST, PUT, DELETE)
@@ -128,7 +129,7 @@ export const FriendsStore = signalStore(
                   next(response) {
                     patchState(
                       store,
-                      addEntity(response.r, { collection: 'server' }),
+                      addEntity(response.friend, { collection: 'server' }),
                       removeEntity(response.tempId, { collection: 'client' }),
                     );
                   },
@@ -150,13 +151,13 @@ export const FriendsStore = signalStore(
             const id = store.selectedFriend();
             return id;
           }),
-          filter((id) => id !== null),
-          map((id) => store.serverEntityMap()[id]),
+          filter((id) => id !== null), // only continue if this predicate is true. (string | null) => string
+          map((id) => store.serverEntityMap()[id]), // jules
           tap((friend) =>
             patchState(
               store,
-              removeEntity(friend.id, { collection: 'server' }),
-              addEntity(friend, { collection: 'client' }),
+              removeEntity(friend.id, { collection: 'server' }), // take them out of server state (or could duplicate...one sec.)
+              addEntity(friend, { collection: 'client' }), // add it to wip
               updateEntity(
                 { id: friend.id, changes: { boughtLastTime: true } },
                 { collection: 'client' },

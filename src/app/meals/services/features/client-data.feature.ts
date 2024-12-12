@@ -1,4 +1,3 @@
-import { inject } from '@angular/core';
 import {
   patchState,
   signalStoreFeature,
@@ -7,7 +6,6 @@ import {
 } from '@ngrx/signals';
 import { addEntity, withEntities } from '@ngrx/signals/entities';
 import { Friend } from '../../types';
-import { FriendsDataService } from '../friends-data.service';
 
 export function withClientFriendData() {
   return signalStoreFeature(
@@ -21,7 +19,7 @@ export function withClientFriendData() {
             boughtLastTime: false,
           };
 
-          patchState(store, addEntity(tempFriend, { collection: 'client' }));
+          patchState(store, addEntity(tempFriend, { collection: 'client' })); // put this in WIP
         },
       };
     }),

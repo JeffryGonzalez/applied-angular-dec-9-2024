@@ -7,11 +7,13 @@ const fakeFriends: Friend[] = [
 ];
 const handlers = [
   http.post('/api/user/friends-that-owe-you-lunch/', async ({ request }) => {
+    await delay();
     const body = (await request.json()) as unknown as Friend;
     body.boughtLastTime = false;
     return HttpResponse.json(body);
   }),
   http.post('/api/user/friends-that-you-owe-lunch/', async ({ request }) => {
+    await delay();
     const body = (await request.json()) as unknown as Friend;
     body.boughtLastTime = true;
     return HttpResponse.json(body);
