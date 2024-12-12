@@ -14,3 +14,8 @@ export const selectFriendCount = createSelector(
 );
 
 export const selectHasFriends = createSelector(selectFriendCount, (f) => f > 0);
+
+export const selectMealActivity = createSelector(
+  selectFriendsFeature,
+  (f) => f.activity,
+);

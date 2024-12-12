@@ -15,13 +15,13 @@ export class FriendsDataService {
       .pipe(map((r) => ({ r, tempId })));
   }
   markFriendAsOwingYou(friend: Friend) {
-    return this.#httpClient.post(
+    return this.#httpClient.post<Friend>(
       '/api/user/friends-that-owe-you-lunch/',
       friend,
     );
   }
   markFriendAsYouOwingThem(friend: Friend) {
-    return this.#httpClient.post(
+    return this.#httpClient.post<Friend>(
       '/api/user/friends-that-you-owe-lunch/',
       friend,
     );

@@ -28,6 +28,8 @@ import {
 } from './features';
 import { FriendsDataService } from './friends-data.service';
 import { setFulfilled, setPending } from '@shared';
+import { Store } from '@ngrx/store';
+import { FriendActions } from '../../shared/state/reducers/actions';
 type CreateType = {
   name: string;
   tempId: string;
@@ -78,15 +80,15 @@ export const FriendsStore = signalStore(
       }),
       selectedFriendInfo: computed(() => {
         const id = store.selectedFriend() || '';
-        const friends = store.serverEntityMap();
-
-        return friends[id];
+        const serverFriends = store.serverEntityMap();
+        const clientFriends = store.clientEntityMap();
+        return serverFriends[id] ?? clientFriends[id];
       }),
     };
   }),
   withMethods((store) => {
     const service = inject(FriendsDataService);
-
+    const reduxStore = inject(Store);
     return {
       _loadServerData: rxMethod<void>(
         pipe(
@@ -153,13 +155,33 @@ export const FriendsStore = signalStore(
           tap((friend) =>
             patchState(
               store,
+              removeEntity(friend.id, { collection: 'server' }),
+              addEntity(friend, { collection: 'client' }),
               updateEntity(
                 { id: friend.id, changes: { boughtLastTime: true } },
-                { collection: 'server' },
+                { collection: 'client' },
               ),
             ),
           ),
-          mergeMap((friend) => service.markFriendAsOwingYou(friend)),
+          mergeMap((friend) =>
+            service.markFriendAsOwingYou(friend).pipe(
+              tapResponse({
+                next(value) {
+                  patchState(
+                    store,
+                    removeEntity(friend.id, { collection: 'client' }),
+                    addEntity(value, { collection: 'server' }),
+                  );
+                },
+                error: (err) => console.log(err),
+                complete() {
+                  reduxStore.dispatch(
+                    FriendActions.boughtForFriennd({ friend: friend.name }),
+                  );
+                },
+              }),
+            ),
+          ),
         ),
       ),
 
@@ -174,13 +196,33 @@ export const FriendsStore = signalStore(
           tap((friend) =>
             patchState(
               store,
+              removeEntity(friend.id, { collection: 'server' }),
+              addEntity(friend, { collection: 'client' }),
               updateEntity(
                 { id: friend.id, changes: { boughtLastTime: false } },
-                { collection: 'server' },
+                { collection: 'client' },
               ),
             ),
           ),
-          mergeMap((friend) => service.markFriendAsYouOwingThem(friend)),
+          mergeMap((friend) =>
+            service.markFriendAsYouOwingThem(friend).pipe(
+              tapResponse({
+                next(value) {
+                  patchState(
+                    store,
+                    removeEntity(friend.id, { collection: 'client' }),
+                    addEntity(value, { collection: 'server' }),
+                  );
+                },
+                error: (err) => console.log(err),
+                complete() {
+                  reduxStore.dispatch(
+                    FriendActions.friendBoughtForYou({ friend: friend.name }),
+                  );
+                },
+              }),
+            ),
+          ),
         ),
       ),
 
