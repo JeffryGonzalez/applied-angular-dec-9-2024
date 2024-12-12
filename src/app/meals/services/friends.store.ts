@@ -7,19 +7,27 @@ import {
   withHooks,
   withMethods,
 } from '@ngrx/signals';
+import { tapResponse } from '@ngrx/operators';
+import {
+  addEntity,
+  removeEntity,
+  setEntities,
+  updateEntity,
+} from '@ngrx/signals/entities';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { filter, map, mergeMap, pipe, switchMap, tap } from 'rxjs';
+import { FriendModel } from '../types';
 import {
   withClientFriendData,
   withFriendsFilter,
   withSavedFormData,
   withSelectedFriend,
   withServerFriendData,
+  withReduxStore,
+  setCount,
 } from './features';
-import { addEntity, removeEntity } from '@ngrx/signals/entities';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, mergeMap, tap, map, switchMap } from 'rxjs';
 import { FriendsDataService } from './friends-data.service';
-import { FriendModel } from '../types';
-import { __core_private_testing_placeholder__ } from '@angular/core/testing';
+import { setFulfilled, setPending } from '@shared';
 type CreateType = {
   name: string;
   tempId: string;
@@ -31,6 +39,7 @@ export const FriendsStore = signalStore(
   withSavedFormData(),
   withServerFriendData(),
   withClientFriendData(),
+  withReduxStore(),
 
   withComputed((store) => {
     // this spot coming soon.
@@ -56,11 +65,12 @@ export const FriendsStore = signalStore(
       stats: computed(() => {
         const friends = store.serverEntities();
         const total = friends.length;
+        const pending = store.clientIds().length;
         const owesYou = friends.filter(
           (f) => f.boughtLastTime === false,
         ).length;
         const youOwe = total - owesYou;
-        return { total, owe: owesYou, youOwe };
+        return { total, owe: owesYou, youOwe, pending };
       }),
       numberOfFriends: computed(() => {
         const friends = store.serverEntities();
@@ -76,7 +86,28 @@ export const FriendsStore = signalStore(
   }),
   withMethods((store) => {
     const service = inject(FriendsDataService);
+
     return {
+      _loadServerData: rxMethod<void>(
+        pipe(
+          tap(() => patchState(store, setPending())),
+          switchMap(() =>
+            // if this gets called multiple times, I don't care about the previous calls.
+            service
+              .getFriends()
+              .pipe(
+                tap((r) =>
+                  patchState(
+                    store,
+                    setEntities(r, { collection: 'server' }),
+                    setFulfilled(),
+                    setCount(r.length),
+                  ),
+                ),
+              ),
+          ),
+        ),
+      ),
       addFriend: rxMethod<string>(
         pipe(
           map((name) => {
@@ -90,46 +121,68 @@ export const FriendsStore = signalStore(
             (
               d, // mergeMap should be used with unsafe HTTP operations (POST, PUT, DELETE)
             ) =>
-              service
-                .addFriend(d.name, d.tempId)
-                .pipe(
-                  tap((f) =>
+              service.addFriend(d.name, d.tempId).pipe(
+                tapResponse({
+                  next(response) {
                     patchState(
                       store,
-                      addEntity(f.r, { collection: 'server' }),
-                      removeEntity(f.tempId, { collection: 'client' }),
-                    ),
-                  ),
-                ),
+                      addEntity(response.r, { collection: 'server' }),
+                      removeEntity(response.tempId, { collection: 'client' }),
+                    );
+                  },
+                  error(err) {
+                    console.error(err);
+                  },
+                  complete() {
+                    patchState(store, setCount(store.serverIds().length));
+                  },
+                }),
+              ),
           ),
         ),
       ),
-      // addFriend: (name: string) => {
-      //   const tempId = crypto.randomUUID();
-      //   store._addTempFriend(name, tempId);
-      //   store._addServerFriend({ name, tempId }); /// resolve WAY later.
-      // },
-      loadAgain: () => {
-        store._loadServerData();
-      },
-      boughtForSelectedUser: () => {
-        // const id = store.selectedFriend();
-        // if (id !== null) {
-        //   patchState(
-        //     store,
-        //     updateEntity({ id, changes: { boughtLastTime: false } }),
-        //   );
-        // }
-      },
-      selectedUserJustBoughtForMe: () => {
-        // const id = store.selectedFriend();
-        // if (id !== null) {
-        //   patchState(
-        //     store,
-        //     updateEntity({ id, changes: { boughtLastTime: true } }),
-        //   );
-        // }
-      },
+
+      boughtForSelectedUser: rxMethod<void>(
+        pipe(
+          map(() => {
+            const id = store.selectedFriend();
+            return id;
+          }),
+          filter((id) => id !== null),
+          map((id) => store.serverEntityMap()[id]),
+          tap((friend) =>
+            patchState(
+              store,
+              updateEntity(
+                { id: friend.id, changes: { boughtLastTime: true } },
+                { collection: 'server' },
+              ),
+            ),
+          ),
+          mergeMap((friend) => service.markFriendAsOwingYou(friend)),
+        ),
+      ),
+
+      selectedUserJustBoughtForMe: rxMethod<void>(
+        pipe(
+          map(() => {
+            const id = store.selectedFriend();
+            return id;
+          }),
+          filter((id) => id !== null),
+          map((id) => store.serverEntityMap()[id]),
+          tap((friend) =>
+            patchState(
+              store,
+              updateEntity(
+                { id: friend.id, changes: { boughtLastTime: false } },
+                { collection: 'server' },
+              ),
+            ),
+          ),
+          mergeMap((friend) => service.markFriendAsYouOwingThem(friend)),
+        ),
+      ),
 
       unFriend: () => {
         // if (store.selectedFriend() !== undefined) {

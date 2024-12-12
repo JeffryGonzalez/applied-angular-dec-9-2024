@@ -9,9 +9,6 @@ import { FriendsStore } from './services/friends.store';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, RouterLink, FriendStatsComponent, RouterLinkActive],
   template: `
-    <button (click)="store.loadAgain()" class="btn btn-lg btn-warning">
-      RELOAD THE DATA
-    </button>
     @if (store.isFulfilled()) {
       <div class="drawer lg:drawer-open">
         <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />

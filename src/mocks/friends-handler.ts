@@ -8,9 +8,15 @@ const fakeFriends: Friend[] = [
   { id: '4', name: 'Michael', boughtLastTime: false },
 ];
 const handlers = [
+  http.post('/api/user/friends-that-owe-you-lunch/', () => {
+    return HttpResponse.json({});
+  }),
+  http.post('/api/user/friends-that-you-owe-lunch/', () => {
+    return HttpResponse.json({});
+  }),
   http.get('/api/user/friends', async () => {
-    await delay(3000);
-    return HttpResponse.json([{ food: 'Tacos', rating: 'Delicious' }]);
+    await delay();
+    return HttpResponse.json(fakeFriends);
   }),
   http.post('/api/user/friends', async ({ request }) => {
     await delay(5000);
