@@ -2,19 +2,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FriendStatsComponent } from './components/friend-stats.component';
 import { FriendsStore } from './services/friends.store';
-import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-meals',
 
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    FriendStatsComponent,
-    RouterLinkActive,
-    JsonPipe,
-  ],
+  imports: [RouterOutlet, RouterLink, FriendStatsComponent, RouterLinkActive],
   template: `
     @if (store.isFulfilled()) {
       <div class="drawer lg:drawer-open">

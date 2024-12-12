@@ -3,6 +3,7 @@ import { WelcomeComponent } from './components/welcome.component';
 
 import { DemoComponent } from './components/demo.component';
 import { HomeComponent } from './components/home.component';
+import { canMatchFeature } from './shared/feature-managment';
 
 export const routes: Routes = [
   {
@@ -11,6 +12,7 @@ export const routes: Routes = [
   },
   {
     path: 'meals',
+    canMatch: [canMatchFeature('meals')],
     loadChildren: () =>
       // we are doing this not to lazy load, but to put it in a separate bundle.
       import('./meals/meals.routes').then((c) => c.MEAL_ROUTES),
