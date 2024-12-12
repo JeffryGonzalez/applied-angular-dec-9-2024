@@ -27,9 +27,10 @@ import {
   setCount,
 } from './features';
 import { FriendsDataService } from './friends-data.service';
-import { setFulfilled, setPending } from '@shared';
+import { setError, setFulfilled, setPending } from '@shared';
 import { Store } from '@ngrx/store';
 import { FriendActions } from '../../shared/state/reducers/actions';
+import { ZodError } from 'zod';
 type CreateType = {
   name: string;
   tempId: string;
@@ -133,8 +134,8 @@ export const FriendsStore = signalStore(
                       removeEntity(response.tempId, { collection: 'client' }),
                     );
                   },
-                  error(err) {
-                    console.error(err);
+                  error(err: ZodError) {
+                    patchState(store, setError(err.name));
                   },
                   complete() {
                     patchState(store, setCount(store.serverIds().length));

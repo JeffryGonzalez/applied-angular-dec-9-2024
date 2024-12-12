@@ -2,12 +2,19 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FriendStatsComponent } from './components/friend-stats.component';
 import { FriendsStore } from './services/friends.store';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-meals',
 
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, FriendStatsComponent, RouterLinkActive],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    FriendStatsComponent,
+    RouterLinkActive,
+    JsonPipe,
+  ],
   template: `
     @if (store.isFulfilled()) {
       <div class="drawer lg:drawer-open">
@@ -56,6 +63,10 @@ import { FriendsStore } from './services/friends.store';
       <span class="loading loading-spinner text-success"></span>
       <span class="loading loading-spinner text-warning"></span>
       <span class="loading loading-spinner text-error"></span>
+    }
+
+    @if (store.error()) {
+      <p>Sorry - that didn't work {{ store.error() }}</p>
     }
   `,
   styles: ``,

@@ -22,14 +22,84 @@ const handlers = [
     await delay();
     return HttpResponse.json(fakeFriends);
   }),
+
+  // when you add a friend...
   http.post('/api/user/friends', async ({ request }) => {
     await delay(5000);
     const body = (await request.json()) as unknown as { name: string };
 
-    const newFriend: Friend = {
+    const newFriend: Friend & {
+      email: string;
+      age: number;
+      history: string[];
+    } = {
       id: crypto.randomUUID(),
       name: body.name,
       boughtLastTime: false,
+      email: body.name + '@company.com',
+      age: 42,
+      history: [
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+        'big long thing',
+      ],
     };
     return HttpResponse.json(newFriend);
   }),

@@ -7,12 +7,11 @@ import {
 } from '@angular/core';
 import { FriendsStore } from '../services/friends.store';
 import { Friend } from '../types';
-import { FriendListComponent } from './friend-list.component';
 
 @Component({
   selector: 'app-friend-details',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FriendListComponent],
+  imports: [],
   template: `
     @if (friend()) {
       @let name = friend().name;
@@ -43,8 +42,6 @@ import { FriendListComponent } from './friend-list.component';
     } @else {
       <p>Four Oh Four</p>
     }
-
-    <app-friend-list />
   `,
   styles: ``,
 })
